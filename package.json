@@ -2,10 +2,10 @@
   "name": "mesto",
   "version": "1.0.0",
   "description": "project for Praktikum",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "node && nodemon app.js"
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
