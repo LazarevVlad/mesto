@@ -4,9 +4,7 @@ const userPath = path.join(__dirname, "../data/users.json");
 const users = require(userPath);
 
 function getUser(val) {
-  return users.find((user) => {
-    return user._id === val;
-  });
+  return users.find((user) => user._id === val);
 }
 
 router.get("/", (req, res, next) => {
