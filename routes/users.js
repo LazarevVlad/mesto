@@ -1,21 +1,21 @@
 const router = require("express").Router();
+const fs = require("fs").promises;
 const path = require("path");
+
 const userPath = path.join(__dirname, "../data/users.json");
-const users = require(userPath);
+// const users = require(userPath);
+const users = async () =>
+  JSON.parse(await fs.readFile(userPath, { encoding: "utf-8" }));
 
-function getUser(val) {
-  return users.find((user) => user._id === val);
-}
+const getUser = async (val) => (await users()).find((user) => user._id === val);
 
-router.get("/", (req, res, next) => {
-  res.send(users);
+router.get("/", async (req, res, next) => {
+  res.send(await users());
   next();
 });
 
-router.get("/:_id", (req, res, next) => {
-  const user = getUser(req.params._id);
-  // console.log(req.params._id);
-  // console.log(user);
+router.get("/:id", async (req, res, next) => {
+  const user = await getUser(req.params.id);
   if (user) {
     res.send(user);
     return;
