@@ -1,0 +1,32 @@
+{
+  "name": "mesto",
+  "version": "1.0.0",
+  "description": "project for Praktikum",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LazarevVlad/mesto.git"
+  },
+  "keywords": [],
+  "author": "Lazarev Vladislav",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LazarevVlad/mesto/issues"
+  },
+  "homepage": "https://github.com/LazarevVlad/mesto#readme",
+  "devDependencies": {
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.21.2",
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "eslint": "^7.2.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "express": "^4.17.1"
+  }
+}
