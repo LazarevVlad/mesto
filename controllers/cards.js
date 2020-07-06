@@ -1,20 +1,45 @@
-const Card = require("../models/card");
+const card = require("../models/card");
 
 module.exports.getCards = (req, res) => {
-  Card.find({})
+  card
+    .find({})
     .then((cards) => res.send({ data: cards }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
-  Card.create({ name, link })
-    .then((card) => res.send({ data: card }))
+  card
+    .create({ name, link, owner: req.user._id })
+    .then((response) => res.send({ data: response }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.id)
-    .then((card) => res.send({ data: card }))
+  card
+    .findByIdAndDelete(req.params.id)
+    .then((response) => res.send({ data: response }))
+    .catch(() => res.status(500).send({ message: "Ошибка" }));
+};
+
+module.exports.likeCard = (req, res) => {
+  card
+    .findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: req.user._id } },
+      { new: true }
+    )
+    .then((response) => res.send({ data: response }))
+    .catch(() => res.status(500).send({ message: "Ошибка" }));
+};
+
+module.exports.dislikeCard = (req, res) => {
+  card
+    .findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: req.user._id } },
+      { new: true }
+    )
+    .then((response) => res.send({ data: response }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
