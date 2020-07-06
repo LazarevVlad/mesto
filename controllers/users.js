@@ -1,22 +1,56 @@
-const User = require("../models/user");
+const user = require("../models/user");
 
 module.exports.getUsers = (req, res) => {
-  User.find({})
+  user
+    .find({})
     .then((users) => res.send({ data: users }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
 
 module.exports.getUserById = (req, res) => {
-  User.findById(req.params.id).then((user) =>
-    res
-      .send({ data: user })
-      .catch(() => res.status(500).send({ message: "Ошибка" }))
-  );
+  user
+    .findById(req.params.id)
+    .then((client) =>
+      res
+        .send({ data: client })
+        .catch(() => res.status(500).send({ message: "Ошибка" }))
+    );
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
+  user
+    .create({ name, about, avatar })
+    .then((client) => res.send({ data: client }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
+};
+
+module.exports.updateUserInfo = (req, res) => {
+  const { name, about } = req.body;
+  user
+    .findByIdAndUpdate(
+      req.params.id,
+      { name, about },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    .then((userInfo) => res.send({ data: userInfo }))
+    .catch(() => res.send({ message: "Ошибка" }));
+};
+
+module.exports.updateAvatar = (req, res) => {
+  const { avatar } = req.body;
+  user
+    .findByIdAndUpdate(
+      req.params.id,
+      { avatar },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    .then((userAvatar) => res.send({ data: userAvatar }))
+    .catch(() => res.send({ message: "Ошибка" }));
 };
