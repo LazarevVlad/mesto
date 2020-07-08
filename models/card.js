@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const validation = require("validator");
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -11,9 +12,7 @@ const cardSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.String,
     validate: {
       validator(v) {
-        return /http(s)?:\/{2}(w{3}.)?(((([\w\d]+(-\w+)+)|(\w{2,}))(.[a-z]{2,6})+)|(([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))(.([0-9]|([1-9]\d)|(1\d\d)|(2[0-4]\d)|(25[0-5]))){2}.([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))))((:(([1-9]\d)|([1-9]\d\d)|([1-9]\d\d\d)|([1-9])))?)((\/[a-z]{2,})*(#)?)/.test(
-          v
-        );
+        return validation.isURL(v);
       },
       message: "Введите ссылку",
     },
