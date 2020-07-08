@@ -12,12 +12,13 @@ module.exports.createCard = (req, res) => {
   card
     .create({ name, link, owner: req.user._id })
     .then((response) => res.send({ data: response }))
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch(() => res.status(500).send({ message: "Ошибка 2" }));
 };
 
 module.exports.deleteCard = (req, res) => {
   card
     .findByIdAndDelete(req.params.id)
+    .orFail(new Error("Пользователь не найден"))
     .then((response) => res.send({ data: response }))
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
@@ -29,7 +30,13 @@ module.exports.likeCard = (req, res) => {
       { $addToSet: { likes: req.user._id } },
       { new: true }
     )
-    .then((response) => res.send({ data: response }))
+    .then((response) => {
+      if (response === null) {
+        res.status(404).send({ message: "Карточка не найдена" });
+      } else {
+        res.send({ data: response });
+      }
+    })
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
 
@@ -40,6 +47,12 @@ module.exports.dislikeCard = (req, res) => {
       { $pull: { likes: req.user._id } },
       { new: true }
     )
-    .then((response) => res.send({ data: response }))
+    .then((response) => {
+      if (response === null) {
+        res.status(404).send({ message: "Карточка не найдена" });
+      } else {
+        res.send({ data: response });
+      }
+    })
     .catch(() => res.status(500).send({ message: "Ошибка" }));
 };

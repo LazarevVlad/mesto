@@ -10,11 +10,14 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   user
     .findById(req.params.id)
-    .then((client) =>
-      res
-        .send({ data: client })
-        .catch(() => res.status(500).send({ message: "Ошибка" }))
-    );
+    .then((client) => {
+      if (client === null) {
+        res.status(404).send({ message: "Пользователь не найден" });
+      } else {
+        res.send({ data: client });
+      }
+    })
+    .catch(() => res.status(500).send({ message: "Ошибка" }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -36,7 +39,13 @@ module.exports.updateUserInfo = (req, res) => {
         runValidators: true,
       }
     )
-    .then((userInfo) => res.send({ data: userInfo }))
+    .then((userInfo) => {
+      if (userInfo === null) {
+        res.status(404).send({ message: "Пользователь не найден" });
+      } else {
+        res.send({ data: userInfo });
+      }
+    })
     .catch(() => res.send({ message: "Ошибка" }));
 };
 
@@ -51,6 +60,12 @@ module.exports.updateAvatar = (req, res) => {
         runValidators: true,
       }
     )
-    .then((userAvatar) => res.send({ data: userAvatar }))
+    .then((userAvatar) => {
+      if (userAvatar === null) {
+        res.status(404).send({ message: "Пользователь не найден" });
+      } else {
+        res.send({ data: userAvatar });
+      }
+    })
     .catch(() => res.send({ message: "Ошибка" }));
 };
