@@ -4,7 +4,7 @@ module.exports.getUsers = (req, res) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch(() => res.status(500).send({ message: "Пользователи не найдены" }));
 };
 
 module.exports.getUserById = (req, res) => {
@@ -17,7 +17,7 @@ module.exports.getUserById = (req, res) => {
         res.send({ data: client });
       }
     })
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch(() => res.status(500).send({ message: "Пользователь не найден" }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -25,7 +25,7 @@ module.exports.createUser = (req, res) => {
   user
     .create({ name, about, avatar })
     .then((client) => res.send({ data: client }))
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch(() => res.status(500).send({ message: "Ошибка при создании" }));
 };
 
 module.exports.updateUserInfo = (req, res) => {
@@ -46,7 +46,7 @@ module.exports.updateUserInfo = (req, res) => {
         res.send({ data: userInfo });
       }
     })
-    .catch(() => res.send({ message: "Ошибка" }));
+    .catch(() => res.send({ message: "Ошибка при обновлении данных" }));
 };
 
 module.exports.updateAvatar = (req, res) => {
@@ -67,5 +67,5 @@ module.exports.updateAvatar = (req, res) => {
         res.send({ data: userAvatar });
       }
     })
-    .catch(() => res.send({ message: "Ошибка" }));
+    .catch(() => res.send({ message: "Ошибка при обновлении данных" }));
 };
