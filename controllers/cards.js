@@ -4,7 +4,7 @@ module.exports.getCards = (req, res) => {
   card
     .find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch(() => res.status(500).send({ message: "Карточки не найдены" }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -12,15 +12,29 @@ module.exports.createCard = (req, res) => {
   card
     .create({ name, link, owner: req.user._id })
     .then((response) => res.send({ data: response }))
-    .catch(() => res.status(500).send({ message: "Ошибка 2" }));
+    .catch(() =>
+      res.status(500).send({ message: "Ошибка при создании карточки" })
+    );
 };
 
 module.exports.deleteCard = (req, res) => {
   card
-    .findByIdAndDelete(req.params.id)
+    .findById(req.params.id)
     .orFail(new Error("Пользователь не найден"))
-    .then((response) => res.send({ data: response }))
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .then((response) => {
+      if (req.user._id === response.owner.toString()) {
+        card
+          .findByIdAndDelete(req.params.id)
+          .then(() =>
+            res.status(200).send({ message: "Карточка удалена успешно!" })
+          );
+      } else {
+        res
+          .status(403)
+          .send({ message: "Вы не можете удалить чужую карточку" });
+      }
+    })
+    .catch(() => res.status(500).send({ message: "Ошибка при удалении" }));
 };
 
 module.exports.likeCard = (req, res) => {
