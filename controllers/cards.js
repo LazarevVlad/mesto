@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   card
     .findById(req.params.id)
-    .orFail(new Error("Пользователь не найден"))
+    .orFail(new Error(`Карточка с id:${req.params.id} не найдена`))
     .then((response) => {
       if (req.user._id === response.owner.toString()) {
         card
@@ -34,7 +34,13 @@ module.exports.deleteCard = (req, res) => {
           .send({ message: "Вы не можете удалить чужую карточку" });
       }
     })
-    .catch(() => res.status(500).send({ message: "Ошибка при удалении" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Неправильный id" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так" });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -51,7 +57,13 @@ module.exports.likeCard = (req, res) => {
         res.send({ data: response });
       }
     })
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Неправильный id" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так" });
+      }
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -68,5 +80,11 @@ module.exports.dislikeCard = (req, res) => {
         res.send({ data: response });
       }
     })
-    .catch(() => res.status(500).send({ message: "Ошибка" }));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        res.status(400).send({ message: "Неправильный id" });
+      } else {
+        res.status(500).send({ message: "Что-то пошло не так" });
+      }
+    });
 };

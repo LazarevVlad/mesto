@@ -23,14 +23,31 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar, email } = req.body;
+  const { name, about, avatar, email, password } = req.body;
   bcrypt
-    .hash(req.body.password, 10)
+    .hash(password, 10)
     .then((hash) => user.create({ name, about, avatar, email, password: hash }))
-    .then((client) => res.send({ data: client }))
-    .catch(() => res.status(500).send({ message: "Ошибка при создании" }));
+    .then((client) =>
+      res.send({
+        id: client._id,
+        name: client.name,
+        about: client.about,
+        avatar: client.avatar,
+        email: client.email,
+      })
+    )
+    .catch((err) => {
+      if (password === undefined) {
+        res.status(400), send({ message: "Введите пароль" });
+      } else if (err.name === "MongoError" && err.code === 11000) {
+        res.status(409).send({ message: "Такой email уже существует" });
+      } else if (err.name === "ValidationError") {
+        res.status(400).send({ message: err });
+      } else {
+        res.status(500).send({ message: "" });
+      }
+    });
 };
-
 module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   user
@@ -85,6 +102,7 @@ module.exports.login = (req, res) => {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
       });
+      res.status(200).send({ message: "Аутентификация прошла успешно" });
     })
     .catch(() => {
       res.status(401).send({ message: "Неправильная почта или пароль" });
