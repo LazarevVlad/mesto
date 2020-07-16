@@ -1,6 +1,9 @@
 {
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb-base"],
   "rules": {
+    "object-curly-newline": "off",
+    "function-paren-newline": "off",
+    "implicit-arrow-linebreak": "off",
     "func-names": ["error", "never"],
     "no-console": "off",
     "consistent-return": "off",
