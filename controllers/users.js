@@ -42,9 +42,9 @@ module.exports.createUser = (req, res) => {
       } else if (err.name === 'MongoError' && err.code === 11000) {
         res.status(409).send({ message: 'Такой email уже существует' });
       } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err });
+        res.status(400).send({ message: err.message });
       } else {
-        res.status(400).send({ message: err });
+        res.status(500).send({ message: err.message });
       }
     });
 };

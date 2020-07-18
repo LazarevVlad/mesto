@@ -12,9 +12,13 @@ module.exports.createCard = (req, res) => {
   card
     .create({ name, link, owner: req.user._id })
     .then((response) => res.send({ data: response }))
-    .catch(() =>
-      res.status(500).send({ message: 'Ошибка при создании карточки' }),
-    );
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else {
+        res.status(500).send({ message: 'Что-то пошло не так' });
+      }
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
