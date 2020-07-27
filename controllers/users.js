@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const user = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 
+const { NODE_ENV, JWT_SECRET } = process.env;
+
 module.exports.getUsers = (req, res) => {
   user
     .find({})
@@ -79,9 +81,13 @@ module.exports.login = (req, res, next) => {
   return user
     .findUserByCredentials(email, password)
     .then((client) => {
-      const token = jwt.sign({ _id: client._id }, 'secret', {
-        expiresIn: '7d',
-      });
+      const token = jwt.sign(
+        { _id: client._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret',
+        {
+          expiresIn: '7d',
+        },
+      );
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
