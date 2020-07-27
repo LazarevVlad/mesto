@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const user = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
+
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports.getUsers = (req, res) => {
   user
@@ -9,20 +12,20 @@ module.exports.getUsers = (req, res) => {
     .catch(() => res.status(400).send({ message: 'Пользователи не найдены' }));
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   user
     .findById(req.params.id)
     .then((client) => {
       if (client === null) {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        throw new NotFoundError('Нет пользователя с таким id');
       } else {
         res.send({ data: client });
       }
     })
-    .catch(() => res.status(400).send({ message: 'Пользователь не найден' }));
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
   bcrypt
     .hash(password, 10)
@@ -36,19 +39,9 @@ module.exports.createUser = (req, res) => {
         email: client.email,
       }),
     )
-    .catch((err) => {
-      if (password === undefined) {
-        res.status(400).send({ message: 'Введите пароль' });
-      } else if (err.name === 'MongoError' && err.code === 11000) {
-        res.status(409).send({ message: 'Такой email уже существует' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message });
-      }
-    });
+    .catch(next);
 };
-module.exports.updateUserInfo = (req, res) => {
+module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
   user
     .findByIdAndUpdate(
@@ -62,12 +55,10 @@ module.exports.updateUserInfo = (req, res) => {
     .then((userInfo) => {
       res.send({ data: userInfo });
     })
-    .catch(() =>
-      res.status(400).send({ message: 'Ошибка при обновлении данных' }),
-    );
+    .catch(next);
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
   console.log(req.user._id);
   user
@@ -82,26 +73,26 @@ module.exports.updateAvatar = (req, res) => {
     .then((userAvatar) => {
       res.send({ data: userAvatar });
     })
-    .catch(() =>
-      res.status(400).send({ message: 'Ошибка при обновлении данных' }),
-    );
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
   return user
     .findUserByCredentials(email, password)
     .then((client) => {
-      const token = jwt.sign({ _id: client._id }, 'secret', {
-        expiresIn: '7d',
-      });
+      const token = jwt.sign(
+        { _id: client._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'secret',
+        {
+          expiresIn: '7d',
+        },
+      );
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
       });
       res.status(200).send({ message: 'Аутентификация прошла успешно' });
     })
-    .catch(() => {
-      res.status(401).send({ message: 'Неправильная почта или пароль' });
-    });
+    .catch(next);
 };
