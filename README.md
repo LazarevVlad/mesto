@@ -2,6 +2,11 @@
 
 Project for Yandex.Praktikum
 
+## IP-адрес сервера и домен
+
+- https://vmesto.tk
+- 84.201.170.27
+
 ## Используемые технологии
 
 - Express - framework for Node.js
