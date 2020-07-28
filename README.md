@@ -12,6 +12,8 @@ Project for Yandex.Praktikum
 - Express - framework for Node.js
 - ESLint
 - EditorConfig
+- MongoDB
+- Mongoose
 
 ## Команды
 
