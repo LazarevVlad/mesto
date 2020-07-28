@@ -1,6 +1,7 @@
 {
   "extends": ["airbnb-base"],
   "rules": {
+    "no-unused-vars": ["error", { "args": "none" }],
     "object-curly-newline": "off",
     "function-paren-newline": "off",
     "implicit-arrow-linebreak": "off",
