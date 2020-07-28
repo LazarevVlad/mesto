@@ -5,11 +5,15 @@ const NotFoundError = require('../errors/not-found-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(400).send({ message: 'Пользователи не найдены' }));
+    .catch(() => {
+      const err = new Error('Пользователи не найдены');
+      err.statusCode = 400;
+      next(err);
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -22,7 +26,11 @@ module.exports.getUserById = (req, res, next) => {
         res.send({ data: client });
       }
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Пользователь не найден');
+      err.statusCode = 400;
+      next(err);
+    });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -39,7 +47,17 @@ module.exports.createUser = (req, res, next) => {
         email: client.email,
       }),
     )
-    .catch(next);
+    .catch((err) => {
+      if (password === undefined) {
+        res.status(400).send({ message: 'Введите пароль' });
+      } else if (err.name === 'MongoError' && err.code === 11000) {
+        res.status(409).send({ message: 'Такой email уже существует' });
+      } else if (err.name === 'ValidationError') {
+        res.status(400).send({ message: err.message });
+      } else {
+        next(err);
+      }
+    });
 };
 module.exports.updateUserInfo = (req, res, next) => {
   const { name, about } = req.body;
@@ -55,7 +73,11 @@ module.exports.updateUserInfo = (req, res, next) => {
     .then((userInfo) => {
       res.send({ data: userInfo });
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Ошибка при обновлении данных');
+      err.statusCode = 400;
+      next(err);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -73,7 +95,11 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((userAvatar) => {
       res.send({ data: userAvatar });
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Ошибка при обновлении данных');
+      err.statusCode = 400;
+      next(err);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -94,5 +120,9 @@ module.exports.login = (req, res, next) => {
       });
       res.status(200).send({ message: 'Аутентификация прошла успешно' });
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Неправильная почта или пароль');
+      err.statusCode = 401;
+      next(err);
+    });
 };
