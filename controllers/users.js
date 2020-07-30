@@ -9,11 +9,7 @@ module.exports.getUsers = (req, res, next) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      const err = new Error('Пользователи не найдены');
-      err.statusCode = 400;
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -26,11 +22,7 @@ module.exports.getUserById = (req, res, next) => {
         res.send({ data: client });
       }
     })
-    .catch(() => {
-      const err = new Error('Пользователь не найден');
-      err.statusCode = 400;
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -48,9 +40,7 @@ module.exports.createUser = (req, res, next) => {
       }),
     )
     .catch((err) => {
-      if (password === undefined) {
-        res.status(400).send({ message: 'Введите пароль' });
-      } else if (err.name === 'MongoError' && err.code === 11000) {
+      if (err.name === 'MongoError' && err.code === 11000) {
         res.status(409).send({ message: 'Такой email уже существует' });
       } else if (err.name === 'ValidationError') {
         res.status(400).send({ message: err.message });
@@ -95,11 +85,7 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((userAvatar) => {
       res.send({ data: userAvatar });
     })
-    .catch(() => {
-      const err = new Error('Ошибка при обновлении данных');
-      err.statusCode = 400;
-      next(err);
-    });
+    .catch(next);
 };
 
 module.exports.login = (req, res, next) => {
