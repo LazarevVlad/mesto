@@ -47,7 +47,10 @@ app.post(
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
       about: Joi.string().required().min(2).max(30),
-      avatar: Joi.string().required().regex(urlValidation),
+      avatar: Joi.string()
+        .required()
+        .regex(urlValidation)
+        .error(new Error('Неправильный формат записи ссылки')),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),

@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const urlValidation = require('../regExp/urlValidation');
 
 const {
   getUsers,
@@ -34,9 +35,8 @@ router.patch(
     body: Joi.object().keys({
       avatar: Joi.string()
         .required()
-        .regex(
-          /^http(s)?:\/{2}(w{3}.)?(((([\w\d]+(-\w+)+)|(\w{2,}))(.[a-z]{2,6})+)|(([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))(.([0-9]|([1-9]\d)|(1\d\d)|(2[0-4]\d)|(25[0-5]))){2}.([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))))((:(([1-9]\d)|([1-9]\d\d)|([1-9]\d\d\d)|([1-9])))?)((\/[a-z]{2,})*(#)?)/,
-        ),
+        .regex(urlValidation)
+        .error(new Error('Неправильный формат записи ссылки')),
     }),
   }),
   updateAvatar,
