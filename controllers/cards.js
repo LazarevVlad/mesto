@@ -14,13 +14,7 @@ module.exports.createCard = (req, res, next) => {
   card
     .create({ name, link, owner: req.user._id })
     .then((response) => res.send({ data: response }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -40,13 +34,7 @@ module.exports.deleteCard = (req, res, next) => {
         throw new ForbiddenError('Вы не можете удалить чужую карточку');
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неправильный id' });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.likeCard = (req, res, next) => {
@@ -63,13 +51,7 @@ module.exports.likeCard = (req, res, next) => {
         res.send({ data: response });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неправильный id' });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.dislikeCard = (req, res, next) => {
@@ -86,11 +68,5 @@ module.exports.dislikeCard = (req, res, next) => {
         res.send({ data: response });
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Неправильный id' });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
