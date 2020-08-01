@@ -2,14 +2,15 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const user = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
+const ConflictError = require('../errors/conflict-err');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   user
     .find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(400).send({ message: 'Пользователи не найдены' }));
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -39,6 +40,12 @@ module.exports.createUser = (req, res, next) => {
         email: client.email,
       }),
     )
+    .catch((err) => {
+      if (err.name === 'MongoError' && err.code === 11000) {
+        throw new ConflictError('Такой email уже существует');
+      }
+      next(err);
+    })
     .catch(next);
 };
 module.exports.updateUserInfo = (req, res, next) => {
@@ -55,7 +62,11 @@ module.exports.updateUserInfo = (req, res, next) => {
     .then((userInfo) => {
       res.send({ data: userInfo });
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Ошибка при обновлении данных');
+      err.statusCode = 400;
+      next(err);
+    });
 };
 
 module.exports.updateAvatar = (req, res, next) => {
@@ -91,8 +102,13 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
+        sameSite: 'strict',
       });
       res.status(200).send({ message: 'Аутентификация прошла успешно' });
     })
-    .catch(next);
+    .catch(() => {
+      const err = new Error('Неправильная почта или пароль');
+      err.statusCode = 401;
+      next(err);
+    });
 };

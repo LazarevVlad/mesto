@@ -7,6 +7,7 @@ const users = require('./routes/users');
 const cards = require('./routes/cards');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middleware/auth');
+const urlValidation = require('./regExp/urlValidation');
 const { requestLogger, errorLogger } = require('./middleware/logger');
 const NotFoundError = require('./errors/not-found-err');
 
@@ -45,12 +46,11 @@ app.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      about: Joi.string().min(2).max(30),
+      about: Joi.string().required().min(2).max(30),
       avatar: Joi.string()
         .required()
-        .regex(
-          /^http(s)?:\/{2}(w{3}.)?(((([\w\d]+(-\w+)+)|(\w{2,}))(.[a-z]{2,6})+)|(([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))(.([0-9]|([1-9]\d)|(1\d\d)|(2[0-4]\d)|(25[0-5]))){2}.([1-9]|([1-9]\d)|(1\d\d)|(2[1-4]\d)|(25[0-5]))))((:(([1-9]\d)|([1-9]\d\d)|([1-9]\d\d\d)|([1-9])))?)((\/[a-z]{2,})*(#)?)/,
-        ),
+        .regex(urlValidation)
+        .error(new Error('Неправильный формат записи ссылки')),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),

@@ -20,7 +20,9 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   card
     .findById(req.params.id)
-    .orFail(new Error(`Карточка с id:${req.params.id} не найдена`))
+    .orFail(
+      () => new NotFoundError(`Карточка с id:${req.params.id} не найдена`),
+    )
     .then((response) => {
       if (req.user._id === response.owner.toString()) {
         card
